@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Tradutor Monolítico para Recursivo</title>
+ 
+</head>
+<body>
+
+    <h1>Tradutor Monolítico ➜ Recursivo</h1>
+
+    <div class="secao">
+        <h2>Definições</h2>
+        
+        <div class="config-inicial">
+            Programa Principal (P) começa em: <strong>R</strong> 
+            <input type="number" id="inputInicio" value="1">
+        </div>
+
+        <div id="containerLinhas">
+            </div>
+
+        <div class="botoes">
+            <button onclick="addLinha('op')">+ Adicionar Operação</button>
+            <button onclick="addLinha('teste')">+ Adicionar Teste</button>
+        </div>
+
+        <button class="btn-gerar" onclick="gerarTraduçao()">GERAR TRADUÇÃO RECURSIVA</button>
+    </div>
+
+    <div class="secao">
+        <h2>Código Traduzido</h2>
+        <pre id="output">O resultado aparecerá aqui...</pre>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 10px;
+}
+
+h1,
+h2 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+}
+
+.secao {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    background: #fff;
+}
+
+.config-inicial {
+    background: #f9f9f9;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #eee;
+}
+
+.linha-comando {
+    background: #fefefe;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.linha-comando:last-child {
+    border-bottom: none;
+}
+
+input {
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+input[type="number"] {
+    width: 45px;
+}
+
+input[type="text"] {
+    width: 60px;
+}
+
+.r-origem {
+    font-weight: bold;
+    background: #ffffcc;
+    border: 1px solid #bbbb88;
+}
+
+.botoes {
+    margin-top: 15px;
+}
+
+button {
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid #999;
+    background: #eee;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #ddd;
+}
+
+.btn-gerar {
+    background: #4CAF50;
+    color: white;
+    border-color: #388E3C;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.btn-remover {
+    color: #cc0000;
+    border-color: #ffa0a0;
+    font-size: 0.8em;
+}
+
+pre {
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    padding: 15px;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.label-instrucao {
+    font-size: 0.8em;
+    color: #666;
+    font-weight: bold;
+    width: 65px;
+    display: inline-block;
+    margin-right: 20px;
+}
