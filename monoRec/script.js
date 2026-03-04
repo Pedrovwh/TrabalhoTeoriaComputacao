@@ -24,7 +24,7 @@ function addLinha(tipo) {
                 `;
     }
 
-    html += `<button class="btn-remover" onclick="this.parentElement.remove(); contadorID--;">remover</button>`;
+    html += `<button class="btn btn-outline-danger" onclick="this.parentElement.remove(); contadorID--;">remover</button>`;
     div.innerHTML = html;
     container.appendChild(div);
     contadorID++;
