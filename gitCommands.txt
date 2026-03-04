@@ -1,0 +1,11 @@
+git config --global --add safe.directory 'E:/5º TERMO/TC 1/TrabalhoTeoriaComputacao-main/TrabalhoTeoriaComputacao'
+git config --global user.name "Jose-Antonio567"
+git config --global user.email "joanmane567@gmail.com"
+git branch devNeto
+git branch
+git checkout devNeto   
+
+git add .
+git commit -m "mensagem do que você fez"
+git push -u origin minhaBranch (se for a primeira vez na branch)
+git push (se ja deu commit dessa branch alguma vez antes)
