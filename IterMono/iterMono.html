@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradutor: Iterativo → Monolítico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #1e40af;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 25px;
+            border-radius: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #1e40af;
+            border-bottom: 2px solid #1e40af;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1);
+        }
+
+        button {
+            background: #1e40af;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #1e3a8a;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        button.secondary:hover {
+            background: #4b5563;
+        }
+
+        button.success {
+            background: #10b981;
+        }
+
+        button.success:hover {
+            background: #059669;
+        }
+
+        button.danger {
+            background: #dc2626;
+        }
+
+        button.danger:hover {
+            background: #b91c1c;
+        }
+
+        .estruturas-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 15px 0;
+        }
+
+        .estrutura-item {
+            background: #f9fafb;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #1e40af;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .estrutura-item.se {
+            border-left-color: #1e40af;
+        }
+
+        .estrutura-item.enquanto {
+            border-left-color: #0891b2;
+        }
+
+        .estrutura-item.ate {
+            border-left-color: #7c3aed;
+        }
+
+        .estrutura-item.operacao {
+            border-left-color: #6b7280;
+        }
+
+        .estrutura-item small {
+            display: block;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .btn-remove {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .btn-remove:hover {
+            background: #b91c1c;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+
+        .exemplo-btn {
+            background: #0891b2;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin: 5px 5px 5px 0;
+        }
+
+        .exemplo-btn:hover {
+            background: #0e7490;
+        }
+
+        .exemplos-section {
+            background: #e0f2fe;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0891b2;
+        }
+
+        .exemplos-section h3 {
+            color: #0891b2;
+            margin-bottom: 10px;
+        }
+
+        .resultado {
+            display: none;
+        }
+
+        .resultado.ativo {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.ativo {
+            color: #1e40af;
+            border-bottom-color: #1e40af;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.ativo {
+            display: block;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #1e40af;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info-box h4 {
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+        }
+
+        .info-box li {
+            margin-bottom: 5px;
+        }
+
+        .monolitico-list {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            padding: 15px;
+            border-radius: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .monolitico-item {
+            padding: 8px;
+            margin-bottom: 8px;
+            background: white;
+            border-left: 3px solid #10b981;
+            padding-left: 12px;
+        }
+
+        footer {
+            background: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tradutor de Programas</h1>
+        <p>Conversão entre Estruturas Iterativas e Monolíticas</p>
+    </header>
+
+    <div class="container">
+        <div id="construtor" class="grid">
+          
+            <div class="card">
+                <h2>Construir Programa</h2>
+
+     
+                <div class="exemplos-section">
+                    <h3>📚 Exemplos Rápidos</h3>
+                    <button class="exemplo-btn" onclick="carregarExemplo('exemplo1')">
+                        Contagem (Enquanto)
+                    </button>
+                    <button class="exemplo-btn" onclick="carregarExemplo('exemplo2')">
+                        Se-Então-Senão
+                    </button>
+                    <button class="exemplo-btn" onclick="carregarExemplo('exemplo3')">
+                        Até (Teste Final)
+                    </button>
+                    <button class="exemplo-btn" onclick="carregarExemplo('exemplo4')">
+                        Aninhado
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Estrutura:</label>
+                    <select id="tipoEstrutura" onchange="atualizarCampos()">
+                        <option value="operacao">Operação (V, W, ...)</option>
+                        <option value="se">Se-Então-Senão</option>
+                        <option value="enquanto">Enquanto</option>
+                        <option value="ate">Até</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group" id="campoTeste" style="display: none;">
+                    <label>Teste:</label>
+                    <select id="teste">
+                        <option value="T1">T1</option>
+                        <option value="T2">T2</option>
+                        <option value="T3">T3</option>
+                        <option value="T4">T4</option>
+                        <option value="T5">T5</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group" id="campoOperacao">
+                    <label>Operação:</label>
+                    <select id="operacao">
+                        <option value="V">V</option>
+                        <option value="W">W</option>
+                        <option value="X">X</option>
+                        <option value="Y">Y</option>
+                        <option value="Z">Z</option>
+                        <option value="vazia">Vazia (✓)</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button onclick="adicionarEstrutura()">+ Adicionar</button>
+                    <button class="secondary" onclick="limparTudo()">Limpar Tudo</button>
+                </div>
+
+                <div class="estruturas-list" id="estruturasList">
+                    <p style="color: #999; text-align: center;">Nenhuma estrutura adicionada</p>
+                </div>
+
+
+                <button class="success" onclick="converter()" style="width: 100%; margin-top: 20px; font-size: 1.1em;">
+                    Converter para Monolítico
+                </button>
+            </div>
+
+   
+            <div class="card">
+                <h2>Pré-visualização</h2>
+                <p style="color: #666; margin-bottom: 15px;">Código Iterativo:</p>
+                <div class="code-block" id="previewIterativo">(vazio)</div>
+
+                <div class="info-box">
+                    <h4>ℹ️ Estrutura Iterativa</h4>
+                    <ul>
+                        <li>Usa Se, Enquanto, Até</li>
+                        <li>Sem desvios incondicionais</li>
+                        <li>Hierarquia clara</li>
+                        <li>Mais legível</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultado" class="resultado">
+            <button class="secondary" onclick="voltarConstrutor()" style="margin-bottom: 20px;">
+                ← Voltar e Editar
+            </button>
+
+            <div class="tabs">
+                <button class="tab-btn ativo" onclick="mudarAba('comparacao')">Comparação</button>
+                <button class="tab-btn" onclick="mudarAba('iterativo')">Iterativo</button>
+                <button class="tab-btn" onclick="mudarAba('monolitico')">Monolítico</button>
+            </div>
+
+
+            <div id="aba-comparacao" class="tab-content ativo">
+                <div class="grid">
+                    <div class="card">
+                        <h2 style="color: #1e40af;">Programa Iterativo</h2>
+                        <div class="code-block" id="codigoIterativo"></div>
+                        <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                            Estrutura com Enquanto, Até e Se-Então-Senão
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h2 style="color: #10b981;">Programa Monolítico</h2>
+                        <div class="monolitico-list" id="codigoMonolitico"></div>
+                        <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                            Estrutura com Testes, Operações e Desvios
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+    
+            <div id="aba-iterativo" class="tab-content">
+                <div class="card">
+                    <h2 style="color: #1e40af;">Programa Iterativo</h2>
+                    <div class="code-block" id="codigoIterativo2"></div>
+                    <div class="info-box">
+                        <h4>Características:</h4>
+                        <ul>
+                            <li><strong>Estruturas de controle explícitas:</strong> Se, Enquanto, Até</li>
+                            <li><strong>Sem desvios incondicionais:</strong> Não usa go to</li>
+                            <li><strong>Hierarquia clara:</strong> Estruturas bem definidas</li>
+                            <li><strong>Mais legível:</strong> Fácil de entender e manter</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="aba-monolitico" class="tab-content">
+                <div class="card">
+                    <h2 style="color: #10b981;">Programa Monolítico</h2>
+                    <p style="margin-bottom: 15px;">Instruções rotuladas com desvios:</p>
+                    <div class="monolitico-list" id="codigoMonolitico2"></div>
+                    <div class="info-box">
+                        <h4>Características:</h4>
+                        <ul>
+                            <li><strong>Instruções rotuladas:</strong> Cada instrução tem um rótulo</li>
+                            <li><strong>Desvios explícitos:</strong> Usa go to para controle de fluxo</li>
+                            <li><strong>Fluxo linear:</strong> Segue de cima para baixo com desvios</li>
+                            <li><strong>Próximo da máquina:</strong> Similar a assembly/bytecode</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+ 
+            <div class="card" style="margin-top: 30px;">
+                <h2>Como a Conversão Funciona</h2>
+                <div class="info-box">
+                    <h4>Padrões de Conversão:</h4>
+                    <ul>
+                        <li><strong>Enquanto T faça D:</strong> Teste T → Se verdadeiro, execute D e volte ao teste</li>
+                        <li><strong>Até T faça D:</strong> Execute D → Teste T → Se falso, volte a D</li>
+                        <li><strong>Se T então D1 senão D2:</strong> Teste T → Se verdadeiro, execute D1; senão, execute D2</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Tradutor de Programas • Teoria da Computação</p>
+        <p style="font-size: 0.9em; margin-top: 10px;">
+            Equivalência: Iterativo ↔ Monolítico ↔ Recursivo
+        </p>
+    </footer>
+
+    <script>
+
+        let estruturas = [];
+
+   
+        const exemplos = {
+            exemplo1: {
+                nome: 'Contagem Simples (Enquanto)',
+                estruturas: [
+                    { tipo: 'operacao', operacao: 'V', teste: null },
+                    { tipo: 'enquanto', operacao: null, teste: 'T1' }
+                ]
+            },
+            exemplo2: {
+                nome: 'Condicional Simples (Se-Então-Senão)',
+                estruturas: [
+                    { tipo: 'se', operacao: null, teste: 'T1' }
+                ]
+            },
+            exemplo3: {
+                nome: 'Até com Teste Final',
+                estruturas: [
+                    { tipo: 'ate', operacao: null, teste: 'T2' }
+                ]
+            },
+            exemplo4: {
+                nome: 'Estrutura Aninhada',
+                estruturas: [
+                    { tipo: 'enquanto', operacao: null, teste: 'T1' },
+                    { tipo: 'se', operacao: null, teste: 'T2' },
+                    { tipo: 'operacao', operacao: 'V', teste: null }
+                ]
+            }
+        };
+
+        function atualizarCampos() {
+            const tipo = document.getElementById('tipoEstrutura').value;
+            const campoTeste = document.getElementById('campoTeste');
+            const campoOperacao = document.getElementById('campoOperacao');
+
+            if (tipo === 'operacao') {
+                campoTeste.style.display = 'none';
+                campoOperacao.style.display = 'block';
+            } else {
+                campoTeste.style.display = 'block';
+                campoOperacao.style.display = 'none';
+            }
+        }
+
+        function adicionarEstrutura() {
+            const tipo = document.getElementById('tipoEstrutura').value;
+            const teste = document.getElementById('teste').value;
+            const operacao = document.getElementById('operacao').value;
+
+            const estrutura = { tipo, teste, operacao };
+            estruturas.push(estrutura);
+
+            atualizarLista();
+            atualizarPreview();
+        }
+
+  
+        function atualizarLista() {
+            const lista = document.getElementById('estruturasList');
+
+            if (estruturas.length === 0) {
+                lista.innerHTML = '<p style="color: #999; text-align: center;">Nenhuma estrutura adicionada</p>';
+                return;
+            }
+
+            lista.innerHTML = estruturas.map((est, idx) => {
+                let desc = '';
+                if (est.tipo === 'operacao') {
+                    desc = `Operação: ${est.operacao}`;
+                } else if (est.tipo === 'se') {
+                    desc = `Se ${est.teste} então... senão...`;
+                } else if (est.tipo === 'enquanto') {
+                    desc = `Enquanto ${est.teste} faça...`;
+                } else if (est.tipo === 'ate') {
+                    desc = `Até ${est.teste} faça...`;
+                }
+
+                return `
+                    <div class="estrutura-item ${est.tipo}">
+                        <div>
+                            <strong>${idx + 1}. ${desc}</strong>
+                            <small>${est.tipo.toUpperCase()}</small>
+                        </div>
+                        <button class="btn-remove" onclick="removerEstrutura(${idx})">Remover</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removerEstrutura(idx) {
+            estruturas.splice(idx, 1);
+            atualizarLista();
+            atualizarPreview();
+        }
+
+    
+        function atualizarPreview() {
+            const preview = document.getElementById('previewIterativo');
+
+            if (estruturas.length === 0) {
+                preview.textContent = '(vazio)';
+                return;
+            }
+
+            const linhas = estruturas.map(est => {
+                if (est.tipo === 'operacao') {
+                    return est.operacao;
+                } else if (est.tipo === 'se') {
+                    return `Se ${est.teste} então D₁ senão D₂`;
+                } else if (est.tipo === 'enquanto') {
+                    return `Enquanto ${est.teste} faça D`;
+                } else if (est.tipo === 'ate') {
+                    return `Até ${est.teste} faça D`;
+                }
+            });
+
+            preview.textContent = linhas.join(';\n');
+        }
+
+        function converter() {
+            if (estruturas.length === 0) {
+                alert('Adicione pelo menos uma estrutura!');
+                return;
+            }
+
+            const iterativo = gerarIterativo();
+            const monolitico = gerarMonolitico();
+
+            document.getElementById('construtor').style.display = 'none';
+            document.getElementById('resultado').classList.add('ativo');
+
+            document.getElementById('codigoIterativo').textContent = iterativo;
+            document.getElementById('codigoIterativo2').textContent = iterativo;
+            document.getElementById('codigoMonolitico').innerHTML = monolitico;
+            document.getElementById('codigoMonolitico2').innerHTML = monolitico;
+        }
+
+    
+        function gerarIterativo() {
+            const linhas = estruturas.map(est => {
+                if (est.tipo === 'operacao') {
+                    return est.operacao;
+                } else if (est.tipo === 'se') {
+                    return `Se ${est.teste} então V senão W`;
+                } else if (est.tipo === 'enquanto') {
+                    return `Enquanto ${est.teste} faça V`;
+                } else if (est.tipo === 'ate') {
+                    return `Até ${est.teste} faça V`;
+                }
+            });
+
+            return linhas.join(';\n');
+        }
+
+        function gerarMonolitico() {
+            let codigo = '';
+            let contador = 0;
+
+            codigo += `<div class="monolitico-item">n${contador}: Partida</div>`;
+            contador++;
+
+            estruturas.forEach((est, idx) => {
+                if (est.tipo === 'operacao') {
+                    codigo += `<div class="monolitico-item">n${contador}: ${est.operacao}</div>`;
+                    contador++;
+                } else if (est.tipo === 'se') {
+                    codigo += `<div class="monolitico-item">n${contador}: Se ${est.teste} então n${contador + 1} senão n${contador + 2}</div>`;
+                    contador++;
+                    codigo += `<div class="monolitico-item">n${contador}: V (ramo verdadeiro)</div>`;
+                    contador++;
+                    codigo += `<div class="monolitico-item">n${contador}: W (ramo falso)</div>`;
+                    contador++;
+                } else if (est.tipo === 'enquanto') {
+                    codigo += `<div class="monolitico-item">n${contador}: Se ${est.teste} então n${contador + 1} senão n${contador + 3}</div>`;
+                    contador++;
+                    codigo += `<div class="monolitico-item">n${contador}: V (corpo do loop)</div>`;
+                    contador++;
+                    codigo += `<div class="monolitico-item">n${contador}: Ir para n${contador - 2}</div>`;
+                    contador++;
+                } else if (est.tipo === 'ate') {
+                    codigo += `<div class="monolitico-item">n${contador}: V (corpo do loop)</div>`;
+                    contador++;
+                    codigo += `<div class="monolitico-item">n${contador}: Se ${est.teste} então n${contador + 2} senão n${contador - 1}</div>`;
+                    contador++;
+                    codigo += `<div class="monolitico-item">n${contador}: Continuar</div>`;
+                    contador++;
+                }
+            });
+
+            codigo += `<div class="monolitico-item">n${contador}: Parada</div>`;
+
+            return codigo;
+        }
+
+
+        function voltarConstrutor() {
+            document.getElementById('construtor').style.display = 'grid';
+            document.getElementById('resultado').classList.remove('ativo');
+        }
+
+
+        function mudarAba(aba) {
+        
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativo'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('ativo'));
+
+            event.target.classList.add('ativo');
+            document.getElementById(`aba-${aba}`).classList.add('ativo');
+        }
+
+       
+        function carregarExemplo(exemploId) {
+            const exemplo = exemplos[exemploId];
+            if (!exemplo) return;
+
+            estruturas = exemplo.estruturas;
+            atualizarLista();
+            atualizarPreview();
+        }
+
+     
+        function limparTudo() {
+            if (confirm('Tem certeza que deseja limpar tudo?')) {
+                estruturas = [];
+                atualizarLista();
+                atualizarPreview();
+            }
+        }
+
+
+        atualizarCampos();
+        atualizarLista();
+    </script>
+</body>
+</html>
