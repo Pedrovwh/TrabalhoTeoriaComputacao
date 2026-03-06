@@ -1,18 +1,18 @@
-let idCounter = 1;
-let rCounter = 1;
+let contadorId = 1;
+let contadorR = 1;
 
-function addStmt(container) {
-  const stmtId = `stmt_${idCounter}`;
-  idCounter++;
+function adicionarInstrucao(container) {
+  const idInstrucao = `stmt_${contadorId}`;
+  contadorId++;
 
   const wrapper = document.createElement("div");
   wrapper.className = "p-2 mb-2 border rounded";
-  wrapper.dataset.stmtId = stmtId;
+  wrapper.dataset.stmtId = idInstrucao;
 
   wrapper.innerHTML = `
     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
       <strong>Instrução:</strong>
-      <select class="form-select form-select-sm stmtType" style="width:180px;" onchange="renderStmtBody(this)">
+      <select class="form-select form-select-sm tipoInstrucao" style="width:180px;" onchange="renderizarCorpoInstrucao(this)">
         <option value="op">OPERAÇÃO (faça F)</option>
         <option value="if">SE (se T então ... senão ...)</option>
         <option value="while">ENQUANTO (enquanto T faça ...)</option>
@@ -20,50 +20,50 @@ function addStmt(container) {
         <option value="nop">✓ (não faz nada)</option>
       </select>
 
-      <button class="btn btn-outline-danger btn-sm" onclick="removeStmt(this)">remover</button>
+      <button class="btn btn-outline-danger btn-sm" onclick="removerInstrucao(this)">remover</button>
     </div>
 
-    <div class="stmtBody mt-2"></div>
+    <div class="corpoInstrucao mt-2"></div>
   `;
 
   container.appendChild(wrapper);
 
   // render inicial como OP
-  const select = wrapper.querySelector(".stmtType");
-  renderStmtBody(select);
+  const select = wrapper.querySelector(".tipoInstrucao");
+  renderizarCorpoInstrucao(select);
 }
 
-function removeStmt(btn) {
+function removerInstrucao(btn) {
   const wrapper = btn.closest("[data-stmt-id]");
   if (wrapper) wrapper.remove();
 }
 
-function renderStmtBody(selectEl) {
+function renderizarCorpoInstrucao(selectEl) {
   const wrapper = selectEl.closest("[data-stmt-id]");
-  const body = wrapper.querySelector(".stmtBody");
-  const type = selectEl.value;
+  const corpo = wrapper.querySelector(".corpoInstrucao");
+  const tipo = selectEl.value;
 
-  if (type === "op") {
-    body.innerHTML = `
+  if (tipo === "op") {
+    corpo.innerHTML = `
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         <span><strong>faça</strong></span>
-        <input type="text" class="form-control form-control-sm opText" placeholder="F" style="width:260px;">
+        <input type="text" class="form-control form-control-sm textoOperacao" placeholder="F" style="width:260px;">
       </div>
     `;
   }
 
-  if (type === "if") {
-    body.innerHTML = `
+  if (tipo === "if") {
+    corpo.innerHTML = `
       <div class="mb-2" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         <strong>se</strong>
-        <input type="text" class="form-control form-control-sm testText" placeholder="T" style="width:260px;">
+        <input type="text" class="form-control form-control-sm textoTeste" placeholder="T" style="width:260px;">
         <strong>então</strong>
       </div>
 
       <div class="ms-3">
         <div class="text-muted mb-1">Bloco ENTÃO:</div>
-        <div class="thenBlock border rounded p-2 mb-2"></div>
-        <button class="btn btn-outline-secondary btn-sm" onclick="addStmt(this.previousElementSibling)">+ Adicionar no ENTÃO</button>
+        <div class="blocoEntao border rounded p-2 mb-2"></div>
+        <button class="btn btn-outline-secondary btn-sm" onclick="adicionarInstrucao(this.previousElementSibling)">+ Adicionar no ENTÃO</button>
       </div>
 
       <div class="mt-3 mb-1" style="display:flex; gap:10px; align-items:center;">
@@ -72,191 +72,194 @@ function renderStmtBody(selectEl) {
 
       <div class="ms-3">
         <div class="text-muted mb-1">Bloco SENÃO:</div>
-        <div class="elseBlock border rounded p-2 mb-2"></div>
-        <button class="btn btn-outline-secondary btn-sm" onclick="addStmt(this.previousElementSibling)">+ Adicionar no SENÃO</button>
+        <div class="blocoSenao border rounded p-2 mb-2"></div>
+        <button class="btn btn-outline-secondary btn-sm" onclick="adicionarInstrucao(this.previousElementSibling)">+ Adicionar no SENÃO</button>
       </div>
     `;
   }
 
-  if (type === "while") {
-    body.innerHTML = `
+  if (tipo === "while") {
+    corpo.innerHTML = `
       <div class="mb-2" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         <strong>enquanto</strong>
-        <input type="text" class="form-control form-control-sm testText" placeholder="T" style="width:260px;">
+        <input type="text" class="form-control form-control-sm textoTeste" placeholder="T" style="width:260px;">
         <strong>faça</strong>
       </div>
 
       <div class="ms-3">
         <div class="text-muted mb-1">Corpo do ENQUANTO:</div>
-        <div class="bodyBlock border rounded p-2 mb-2"></div>
-        <button class="btn btn-outline-secondary btn-sm" onclick="addStmt(this.previousElementSibling)">+ Adicionar no CORPO</button>
+        <div class="blocoCorpo border rounded p-2 mb-2"></div>
+        <button class="btn btn-outline-secondary btn-sm" onclick="adicionarInstrucao(this.previousElementSibling)">+ Adicionar no CORPO</button>
       </div>
     `;
   }
 
-  if (type === "until") {
-    body.innerHTML = `
+  if (tipo === "until") {
+    corpo.innerHTML = `
       <div class="mb-2" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         <strong>até</strong>
-        <input type="text" class="form-control form-control-sm testText" placeholder="T" style="width:260px;">
+        <input type="text" class="form-control form-control-sm textoTeste" placeholder="T" style="width:260px;">
         <strong>faça</strong>
       </div>
 
       <div class="ms-3">
         <div class="text-muted mb-1">Corpo do ATÉ:</div>
-        <div class="bodyBlock border rounded p-2 mb-2"></div>
-        <button class="btn btn-outline-secondary btn-sm" onclick="addStmt(this.previousElementSibling)">+ Adicionar no CORPO</button>
+        <div class="blocoCorpo border rounded p-2 mb-2"></div>
+        <button class="btn btn-outline-secondary btn-sm" onclick="adicionarInstrucao(this.previousElementSibling)">+ Adicionar no CORPO</button>
       </div>
     `;
   }
 
-  if (type === "nop") {
-    body.innerHTML = `<div class="text-muted"><strong>✓</strong> (não faz nada)</div>`;
+  if (tipo === "nop") {
+    corpo.innerHTML = `<div class="text-muted"><strong>✓</strong> (não faz nada)</div>`;
   }
 }
 
-function parseContainer(container) {
-  const stmts = [];
-  const children = container.querySelectorAll(":scope > [data-stmt-id]");
-  children.forEach(w => {
-    const type = w.querySelector(".stmtType").value;
+function lerContainer(container) {
+  const instrucoes = [];
+  const filhos = container.querySelectorAll(":scope > [data-stmt-id]");
 
-    if (type === "op") {
-      const txt = (w.querySelector(".opText").value || "").trim();
-      stmts.push({ kind: "op", text: txt.length ? txt : "F" });
+  filhos.forEach(w => {
+    const tipo = w.querySelector(".tipoInstrucao").value;
+
+    if (tipo === "op") {
+      const texto = (w.querySelector(".textoOperacao").value || "").trim();
+      instrucoes.push({ kind: "op", text: texto.length ? texto : "F" });
     }
 
-    if (type === "nop") {
-      stmts.push({ kind: "nop" });
+    if (tipo === "nop") {
+      instrucoes.push({ kind: "nop" });
     }
 
-    if (type === "if") {
-      const t = (w.querySelector(".testText").value || "").trim();
-      const thenBlock = w.querySelector(".thenBlock");
-      const elseBlock = w.querySelector(".elseBlock");
-      stmts.push({
+    if (tipo === "if") {
+      const teste = (w.querySelector(".textoTeste").value || "").trim();
+      const blocoEntao = w.querySelector(".blocoEntao");
+      const blocoSenao = w.querySelector(".blocoSenao");
+
+      instrucoes.push({
         kind: "if",
-        test: t.length ? t : "T",
-        then: parseContainer(thenBlock),
-        els: parseContainer(elseBlock)
+        test: teste.length ? teste : "T",
+        then: lerContainer(blocoEntao),
+        els: lerContainer(blocoSenao)
       });
     }
 
-    if (type === "while") {
-      const t = (w.querySelector(".testText").value || "").trim();
-      const bodyBlock = w.querySelector(".bodyBlock");
-      stmts.push({
+    if (tipo === "while") {
+      const teste = (w.querySelector(".textoTeste").value || "").trim();
+      const blocoCorpo = w.querySelector(".blocoCorpo");
+
+      instrucoes.push({
         kind: "while",
-        test: t.length ? t : "T",
-        body: parseContainer(bodyBlock)
+        test: teste.length ? teste : "T",
+        body: lerContainer(blocoCorpo)
       });
     }
 
-    if (type === "until") {
-      const t = (w.querySelector(".testText").value || "").trim();
-      const bodyBlock = w.querySelector(".bodyBlock");
-      stmts.push({
+    if (tipo === "until") {
+      const teste = (w.querySelector(".textoTeste").value || "").trim();
+      const blocoCorpo = w.querySelector(".blocoCorpo");
+
+      instrucoes.push({
         kind: "until",
-        test: t.length ? t : "T",
-        body: parseContainer(bodyBlock)
+        test: teste.length ? teste : "T",
+        body: lerContainer(blocoCorpo)
       });
     }
   });
 
-  return stmts;
+  return instrucoes;
 }
 
-function newR() {
-  const name = `R${rCounter}`;
-  rCounter++;
-  return name;
+function novoR() {
+  const nome = `R${contadorR}`;
+  contadorR++;
+  return nome;
 }
 
-function compileSeq(stmts, next, defs) {
-  if (!stmts || stmts.length === 0) {
-    return next;
+function compilarSequencia(instrucoes, proximo, definicoes) {
+  if (!instrucoes || instrucoes.length === 0) {
+    return proximo;
   }
 
-  let cont = next;
+  let continua = proximo;
 
-  for (let i = stmts.length - 1; i >= 0; i--) {
-    cont = compileStmt(stmts[i], cont, defs);
+  for (let i = instrucoes.length - 1; i >= 0; i--) {
+    continua = compilarInstrucao(instrucoes[i], continua, definicoes);
   }
 
-  return cont;
+  return continua;
 }
 
-function compileStmt(stmt, next, defs) {
+function compilarInstrucao(instrucao, proximo, definicoes) {
   // OPERAÇÃO
-  if (stmt.kind === "op") {
-    const cur = newR();
-    const txt = (stmt.text && stmt.text.trim().length) ? stmt.text.trim() : "F";
-    defs.push(`${cur} def ${txt}; ${next}`);
-    return cur;
+  if (instrucao.kind === "op") {
+    const atual = novoR();
+    const texto = (instrucao.text && instrucao.text.trim().length) ? instrucao.text.trim() : "F";
+    definicoes.push(`${atual} def ${texto}; ${proximo}`);
+    return atual;
   }
 
   // (não faz nada)
-  if (stmt.kind === "nop") {
-    return next;
+  if (instrucao.kind === "nop") {
+    return proximo;
   }
 
   // IF: se T então A senão B
-  if (stmt.kind === "if") {
-    const cur = newR();
-    const test = (stmt.test && stmt.test.trim().length) ? stmt.test.trim() : "T";
+  if (instrucao.kind === "if") {
+    const atual = novoR();
+    const teste = (instrucao.test && instrucao.test.trim().length) ? instrucao.test.trim() : "T";
 
-    const thenEntry = compileSeq(stmt.then, next, defs);
-    const elseEntry = compileSeq(stmt.els, next, defs);
+    const entradaEntao = compilarSequencia(instrucao.then, proximo, definicoes);
+    const entradaSenao = compilarSequencia(instrucao.els, proximo, definicoes);
 
-    defs.push(`${cur} def (se ${test} então ${thenEntry} senão ${elseEntry})`);
-    return cur;
+    definicoes.push(`${atual} def (se ${teste} então ${entradaEntao} senão ${entradaSenao})`);
+    return atual;
   }
 
   // WHILE: enquanto T faça BODY
-  if (stmt.kind === "while") {
-    const loop = newR();
-    const test = (stmt.test && stmt.test.trim().length) ? stmt.test.trim() : "T";
+  if (instrucao.kind === "while") {
+    const loop = novoR();
+    const teste = (instrucao.test && instrucao.test.trim().length) ? instrucao.test.trim() : "T";
 
-    const bodyEntry = compileSeq(stmt.body, loop, defs);
+    const entradaCorpo = compilarSequencia(instrucao.body, loop, definicoes);
 
-    defs.push(`${loop} def (se ${test} então ${bodyEntry} senão ${next})`);
+    definicoes.push(`${loop} def (se ${teste} então ${entradaCorpo} senão ${proximo})`);
     return loop;
   }
 
-  // UNTIL: até T faça BODY  
-  if (stmt.kind === "until") {
-    const loop = newR();
-    const check = newR();
-    const test = (stmt.test && stmt.test.trim().length) ? stmt.test.trim() : "T";
+  // UNTIL: até T faça BODY
+  if (instrucao.kind === "until") {
+    const loop = novoR();
+    const checagem = novoR();
+    const teste = (instrucao.test && instrucao.test.trim().length) ? instrucao.test.trim() : "T";
 
-    const bodyEntry = compileSeq(stmt.body, check, defs);
+    const entradaCorpo = compilarSequencia(instrucao.body, checagem, definicoes);
 
-    defs.push(`${check} def (se ${test} então ${next} senão ${loop})`);
-    defs.push(`${loop} def ${bodyEntry}`);
+    definicoes.push(`${checagem} def (se ${teste} então ${proximo} senão ${loop})`);
+    definicoes.push(`${loop} def ${entradaCorpo}`);
 
     return loop;
   }
 
-  return next;
+  return proximo;
 }
 
 function gerarTraducaoIterRec() {
-  rCounter = 1;
+  contadorR = 1;
 
-  const root = document.getElementById("programRoot");
-  const stmts = parseContainer(root);
+  const raiz = document.getElementById("programRoot");
+  const instrucoes = lerContainer(raiz);
 
-  if (!stmts || stmts.length === 0) {
+  if (!instrucoes || instrucoes.length === 0) {
     document.getElementById("output").innerText = "Adiciona pelo menos 1 instrução.";
     return;
   }
 
-  const defs = [];
-  const start = compileSeq(stmts, "✓", defs);
+  const definicoes = [];
+  const inicio = compilarSequencia(instrucoes, "✓", definicoes);
 
-  let out = `P é ${start} onde\n`;
+  let saida = `P é ${inicio} onde\n`;
+  saida += definicoes.join(",\n");
 
-  out += defs.join(",\n");
-
-  document.getElementById("output").innerText = out;
+  document.getElementById("output").innerText = saida;
 }
